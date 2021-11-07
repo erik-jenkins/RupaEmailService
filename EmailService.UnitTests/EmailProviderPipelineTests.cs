@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using EmailService.EmailProviders;
 using EmailService.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace EmailService.UnitTests
         public async Task SendAsync_NoProviders_ThrowsException()
         {
             // arrange
-            var emailProviderPipeline = new EmailProviderPipeline();
+            var emailProviderPipeline = GetEmailProviderPipeline();
 
             // act & assert
             var email = GetTestingEmail();
@@ -24,7 +25,7 @@ namespace EmailService.UnitTests
         public async Task SendAsync_OneEmailProvider_UsesOnlyEmailProvider()
         {
             // arrange
-            var emailProviderPipeline = new EmailProviderPipeline();
+            var emailProviderPipeline = GetEmailProviderPipeline();
             var provider = new Mock<IEmailProvider>();
             emailProviderPipeline.AddEmailProvider(provider.Object);
 
@@ -40,7 +41,7 @@ namespace EmailService.UnitTests
         public async Task SendAsync_FirstOfTwoProvidersFails_UsesSecondProvider()
         {
             // arrange
-            var pipeline = new EmailProviderPipeline();
+            var pipeline = GetEmailProviderPipeline();
             var failingProvider = new Mock<IEmailProvider>();
             failingProvider.Setup(p => p.SendAsync(It.IsAny<Email>())).Throws<Exception>();
             var backupProvider = new Mock<IEmailProvider>();
@@ -54,6 +55,13 @@ namespace EmailService.UnitTests
 
             // assert
             backupProvider.Verify(p => p.SendAsync(email), Times.Once);
+        }
+
+        private EmailProviderPipeline GetEmailProviderPipeline()
+        {
+            var mockedLogger = new Mock<ILogger<EmailProviderPipeline>>();
+            var pipeline = new EmailProviderPipeline(mockedLogger.Object);
+            return pipeline;
         }
 
         private Email GetTestingEmail()
