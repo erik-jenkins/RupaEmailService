@@ -21,6 +21,7 @@ namespace EmailService
         {
             services.AddControllers();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "EmailService", Version = "v1"}); });
+            services.AddHttpClient();
             services.AddEmailProviders(_configuration.GetSection("Email"));
         }
 

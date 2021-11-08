@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmailService.Exceptions;
 using EmailService.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -38,7 +39,7 @@ namespace EmailService.EmailProviders
                     await status.CircuitBreaker.ExecuteAsync(async () => await status.Provider.SendAsync(email));
                     emailSent = true;
                 }
-                catch (Exception)
+                catch (FailedToSendEmailException)
                 {
                     // ignored
                 }
@@ -60,7 +61,7 @@ namespace EmailService.EmailProviders
             {
                 Provider = provider;
 
-                Action<Exception, TimeSpan> onBreak = (_, duration) =>
+                Action<Exception, TimeSpan> onBreak = (_, _) =>
                 {
                     logger.LogInformation("Error threshold for provider {Provider} exceeded. Failing over to next option.", Provider);
                 };

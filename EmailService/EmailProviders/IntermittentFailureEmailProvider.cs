@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EmailService.Exceptions;
 using EmailService.Models;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +21,7 @@ namespace EmailService.EmailProviders
         {
             _callCount++;
             if (_callCount % 5 == 0)
-                throw new Exception();
+                throw new FailedToSendEmailException();
 
             _logger.LogInformation("Sending email with IntermittentFailureEmailProvider: {Email}", JsonSerializer.Serialize(email));
             return Task.CompletedTask;

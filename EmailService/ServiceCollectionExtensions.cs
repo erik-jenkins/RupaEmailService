@@ -40,7 +40,7 @@ namespace EmailService
             foreach (var (provider, _) in providerSettingsMap.OrderBy(kvp => kvp.Value.Rank))
             {
                 var providerType = GetEmailProviderType(provider);
-                services.AddTransient(providerType);
+                services.AddSingleton(providerType);
             }
 
             services.AddSingleton<IEmailProviderPipeline>(sp =>

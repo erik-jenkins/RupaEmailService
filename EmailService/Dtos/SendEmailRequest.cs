@@ -12,7 +12,6 @@ namespace EmailService.Dtos
         public string To { get; set; } = "";
 
         [Required]
-        [EmailAddress]
         [JsonPropertyName("to_name")]
         public string ToName { get; set; } = "";
 
@@ -22,17 +21,14 @@ namespace EmailService.Dtos
         public string From { get; set; } = "";
 
         [Required]
-        [EmailAddress]
         [JsonPropertyName("from_name")]
         public string FromName { get; set; } = "";
 
         [Required]
-        [EmailAddress]
         [JsonPropertyName("subject")]
         public string Subject { get; set; } = "";
 
         [Required]
-        [EmailAddress]
         [JsonPropertyName("body")]
         public string Body { get; set; } = "";
 
