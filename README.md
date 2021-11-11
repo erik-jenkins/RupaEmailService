@@ -18,7 +18,7 @@ Some of my goals when approaching this exercise were:
 
 Here's a high-level architecture diagram:
 
-![high level architecture](docs/architecture.png)
+![high level architecture](docs/emailservicearchitecture.png)
 
 The main service that handles the sending of emails is the `EmailProviderPipeline`, which abstracts a "chain of responsibility" of email providers. This pipeline contains a list of providers, the presence and order of which depend on the `appsettings.json` config file. These providers are what ultimately send the email to services like Sendgrid or Mailgun.
 
