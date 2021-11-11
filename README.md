@@ -39,3 +39,7 @@ I tried to place logging in the expected places - if this were a real applicatio
 Additionally, given more time I would have added more tests and tried to package the application in a Dockerfile for easy deployments via docker-compose or Kubernetes. The tests I did add test the main flow of "what happens when the preferred mail provider fails?"
 
 Certain files are in need of cleanup, most obviously the `ServiceCollectionExtensions.cs` file, which contains the logic for configuring the options from the appsettings file as well as registering services with the DI container based on the contents of the configuration file.
+
+## Time Spent
+
+I spent somewhere in the neighborhood of five to six hours on this project.
