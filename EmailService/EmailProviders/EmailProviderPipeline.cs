@@ -17,7 +17,7 @@ namespace EmailService.EmailProviders
 
     public class EmailProviderPipeline : IEmailProviderPipeline
     {
-        private readonly List<EmailProviderStatus> _emailProviderStatuses = new();
+        private readonly List<EmailProviderHandle> _emailProviderHandles = new();
         private readonly ILogger<EmailProviderPipeline> _logger;
 
         public EmailProviderPipeline(ILogger<EmailProviderPipeline> logger)
@@ -30,34 +30,38 @@ namespace EmailService.EmailProviders
             var emailSent = false;
             while (!emailSent)
             {
-                var status = _emailProviderStatuses.FirstOrDefault(status => status.IsEnabled());
-                if (status == null)
+                var handle = _emailProviderHandles.FirstOrDefault(handle => handle.IsEnabled());
+                if (handle == null)
                     throw new Exception("No email providers are available to handle the request.");
 
                 try
                 {
-                    await status.CircuitBreaker.ExecuteAsync(async () => await status.Provider.SendAsync(email));
+                    await handle.SendAsync(email);
                     emailSent = true;
                 }
-                catch (FailedToSendEmailException)
+                catch (FailedToSendEmailException ex)
                 {
-                    // ignored
+                    _logger.LogError(ex, "Failed to send email with handler {HandlerType}", handle.Provider.GetType());
                 }
             }
         }
 
         public void AddEmailProvider<T>(T emailProvider) where T : IEmailProvider
         {
-            var status = new EmailProviderStatus(emailProvider, _logger);
-            _emailProviderStatuses.Add(status);
+            var handle = new EmailProviderHandle(emailProvider, _logger);
+            _emailProviderHandles.Add(handle);
         }
 
-        private class EmailProviderStatus
+        /// <summary>
+        /// A convenience class for packaging the provider along with the circuit breaker policy
+        /// that will allow
+        /// </summary>
+        private class EmailProviderHandle
         {
             public IEmailProvider Provider { get; }
-            public AsyncCircuitBreakerPolicy CircuitBreaker { get; }
+            private AsyncCircuitBreakerPolicy CircuitBreaker { get; }
 
-            public EmailProviderStatus(IEmailProvider provider, ILogger logger)
+            public EmailProviderHandle(IEmailProvider provider, ILogger logger)
             {
                 Provider = provider;
 
@@ -77,13 +81,18 @@ namespace EmailService.EmailProviders
                 };
 
                 CircuitBreaker = Policy
-                    .Handle<Exception>()
+                    .Handle<FailedToSendEmailException>()
                     .CircuitBreakerAsync(
                         1,
                         TimeSpan.FromSeconds(10),
                         onBreak,
                         onReset,
                         onHalfOpen);
+            }
+
+            public async Task SendAsync(Email email)
+            {
+                await CircuitBreaker.ExecuteAsync(async () => await Provider.SendAsync(email));
             }
 
             public bool IsEnabled() => CircuitBreaker.CircuitState is CircuitState.Closed or CircuitState.HalfOpen;

@@ -3,7 +3,6 @@ using EmailService.Dtos;
 using EmailService.EmailProviders;
 using EmailService.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace EmailService.Controllers
 {
@@ -12,16 +11,17 @@ namespace EmailService.Controllers
     public class EmailController : ControllerBase
     {
         private readonly IEmailProviderPipeline _emailProviderPipeline;
-        private readonly ILogger<EmailController> _logger;
 
-        public EmailController(
-            IEmailProviderPipeline emailProviderPipeline,
-            ILogger<EmailController> logger)
+        public EmailController(IEmailProviderPipeline emailProviderPipeline)
         {
             _emailProviderPipeline = emailProviderPipeline;
-            _logger = logger;
         }
 
+        /// <summary>
+        /// Sends an email using the providers configured in appsettings.json.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequest request)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using EmailService.EmailProviders;
+using EmailService.Exceptions;
 using EmailService.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -43,7 +44,7 @@ namespace EmailService.UnitTests
             // arrange
             var pipeline = GetEmailProviderPipeline();
             var failingProvider = new Mock<IEmailProvider>();
-            failingProvider.Setup(p => p.SendAsync(It.IsAny<Email>())).Throws<Exception>();
+            failingProvider.Setup(p => p.SendAsync(It.IsAny<Email>())).Throws<FailedToSendEmailException>();
             var backupProvider = new Mock<IEmailProvider>();
 
             pipeline.AddEmailProvider(failingProvider.Object);

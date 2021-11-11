@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using EmailService.Models;
 
 namespace EmailService.Dtos
@@ -32,6 +33,11 @@ namespace EmailService.Dtos
         [JsonPropertyName("body")]
         public string Body { get; set; } = "";
 
-        public static explicit operator Email(SendEmailRequest request) => new(request.To, request.ToName, request.From, request.FromName, request.Subject, request.Body);
+        public static explicit operator Email(SendEmailRequest request) => new(request.To, request.ToName, request.From, request.FromName, request.Subject, RemoveHtmlTags(request.Body));
+
+        private static string RemoveHtmlTags(string s)
+        {
+            return Regex.Replace(s, "<.*?>", string.Empty);
+        }
     }
 }

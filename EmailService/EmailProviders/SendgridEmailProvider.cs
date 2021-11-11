@@ -27,6 +27,7 @@ namespace EmailService.EmailProviders
             var sendgridOptions = optionsMonitor.Get(EmailProviderSettings.Sendgrid) ?? throw new ArgumentException("Failed to load options");
             _uri = sendgridOptions.Uri ?? throw new ArgumentException("Sendgrid settings did not contain URI");
             _apiKey = sendgridOptions.ApiKey ?? throw new ArgumentException("Sendgrid settings did not contain API key");
+
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }

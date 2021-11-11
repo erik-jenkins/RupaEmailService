@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
+// Disabling ReSharper warnings on the next line because accessors are used behind the scenes by the JsonSerializer
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace EmailService.Dtos
